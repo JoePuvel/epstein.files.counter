@@ -37,6 +37,37 @@
             font-weight: bold;
             color: #FF0000; /* Red to pop against the dark background */
         }
+
+        .question-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .question-section p {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        #ask-button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #ask-button:disabled {
+            background-color: gray;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        #ask-counter {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -44,19 +75,97 @@
         <h1>Days Without the Epstein Files</h1>
         <p>Since Trump's Inauguration</p>
         <span id="days-counter"></span>
+        <div class="question-section">
+            <p>Why are they not released yet?!</p>
+            <button id="ask-button">Ask this question yourself</button>
+        </div>
+        <p>People who have asked this question: <span id="ask-counter">0</span></p>
     </div>
     <script>
-        // Calculate days since Trump's 2025 inauguration
-        function calculateDaysSince() {
-            const inaugurationDate = new Date('2025-01-20');
-            const today = new Date();
-            const timeDiff = today - inaugurationDate;
-            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            return daysDiff;
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculate days since Trump's 2025 inauguration
+            function calculateDaysSince() {
+                const inaugurationDate = new Date('2025-01-20');
+                const today = new Date();
+                const timeDiff = today - inaugurationDate;
+                const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                return daysDiff;
+            }
 
-        // Display the days count
-        document.getElementById('days-counter').textContent = calculateDaysSince();
+            // Display the days count
+            document.getElementById('days-counter').textContent = calculateDaysSince();
+
+            // Cookie functions to track if the button has been clicked
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
+
+            function getCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for(var i=0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                }
+                return null;
+            }
+
+            // Namespace for CountAPI (replace with your repository name if different)
+            const namespace = 'epstein.files.counter';
+            const key = 'ask_question';
+
+            // Function to fetch the current count from CountAPI
+            function getCount() {
+                fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('ask-counter').textContent = data.value || 0;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching count:', error);
+                    });
+            }
+
+            // Function to increment the count on CountAPI
+            function incrementCount() {
+                fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        setCookie('has_asked', 'true', 365); // Set cookie for 1 year
+                        document.getElementById('ask-counter').textContent = data.value;
+                        const askButton = document.getElementById('ask-button');
+                        askButton.disabled = true;
+                        askButton.textContent = 'You have already asked this question';
+                    })
+                    .catch(error => {
+                        console.error('Error incrementing count:', error);
+                        document.getElementById('ask-button').disabled = false; // Re-enable if error
+                    });
+            }
+
+            // Initialize the counter on page load
+            getCount();
+
+            const askButton = document.getElementById('ask-button');
+
+            // Check if the user has already clicked the button
+            if (getCookie('has_asked')) {
+                askButton.disabled = true;
+                askButton.textContent = 'You have already asked this question';
+            } else {
+                askButton.addEventListener('click', function() {
+                    askButton.disabled = true; // Disable immediately to prevent multiple clicks
+                    incrementCount();
+                });
+            }
+        });
     </script>
 </body>
 </html>
