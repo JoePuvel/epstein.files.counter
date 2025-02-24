@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Days Without the Epstein Files</title>
+    <style>
+        body {
+            background-color: #36454F; /* Charcoal black */
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height, no scrolling */
+            color: white;
+        }
+
+        h1 {
+            font-size: 48px; /* Big and bold */
+            font-weight: bold;
+            margin: 0;
+        }
+
+        p {
+            font-size: 24px; /* Smaller text */
+            margin: 10px 0;
+        }
+
+        #days-counter {
+            font-size: 72px; /* Large and eye-catching */
+            font-weight: bold;
+            color: #FF0000; /* Red to pop against the dark background */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Days Without the Epstein Files</h1>
+        <p>Since Trump's Inauguration</p>
+        <span id="days-counter"></span>
+    </div>
+    <script>
+        // Calculate days since Trump's 2025 inauguration
+        function calculateDaysSince() {
+            const inaugurationDate = new Date('2025-01-20');
+            const today = new Date();
+            const timeDiff = today - inaugurationDate;
+            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            return daysDiff;
+        }
+
+        // Display the days count
+        document.getElementById('days-counter').textContent = calculateDaysSince();
+    </script>
+</body>
+</html>
